@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/storage/secure.dart';
@@ -12,7 +13,16 @@ class NotesListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (ctx) => NotesViewModel(ctx.read<SecureStore>())..load(),
+      create: (ctx) {
+        final vm = NotesViewModel();
+        // Inicializa sin bloquear el build
+        Future.microtask(() async {
+          final isAndroid = Platform.isAndroid;
+          final host = isAndroid ? '10.0.2.2' : 'localhost';
+          await vm.init(ctx.read<SecureStore>(), host: host, port: 3000);
+        });
+        return vm;
+      },
       child: const _NotesListBody(),
     );
   }
@@ -31,11 +41,39 @@ class _NotesListBody extends StatelessWidget {
         title: const Text('Notas'),
         actions: [
           IconButton(
+            tooltip: 'Sincronizar',
+            onPressed: vm.busy
+                ? null
+                : () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    messenger.hideCurrentSnackBar();
+                    messenger.showSnackBar(
+                      const SnackBar(content: Text('Sincronizando...')),
+                    );
+
+                    await context.read<NotesViewModel>().sync();
+
+                    if (context.mounted) {
+                      messenger.hideCurrentSnackBar();
+                      messenger.showSnackBar(
+                        const SnackBar(content: Text('Sincronización completa')),
+                      );
+                    }
+                  },
+            icon: vm.busy
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.sync),
+          ),
+          IconButton(
             tooltip: 'Salir',
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await auth.logout();
-              if (context.mounted) Navigator.of(context).pop(); // vuelve al Login (home se decide por AuthVM)
+              if (context.mounted) Navigator.of(context).pop();
             },
           ),
         ],
@@ -43,7 +81,7 @@ class _NotesListBody extends StatelessWidget {
       body: vm.busy
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: vm.refresh,
+              onRefresh: vm.sync,
               child: vm.items.isEmpty
                   ? const ListTile(title: Text('Sin notas. Pulsa + para crear.'))
                   : ListView.separated(
@@ -58,7 +96,10 @@ class _NotesListBody extends StatelessWidget {
             MaterialPageRoute(builder: (_) => const NoteFormPage()),
           );
           if (data != null) {
-            final ok = await context.read<NotesViewModel>().add(data['title'], data['content']);
+            final ok = await context.read<NotesViewModel>().add(
+                  data['title'] as String,
+                  data['content'] as String,
+                );
             if (!ok && context.mounted) {
               final err = context.read<NotesViewModel>().error ?? 'Error creando nota';
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
@@ -97,8 +138,8 @@ class _NoteTile extends StatelessWidget {
         if (data != null) {
           final ok = await context.read<NotesViewModel>().edit(
                 note.id,
-                data['title'],
-                data['content'],
+                data['title'] as String,
+                data['content'] as String,
               );
           if (!ok && context.mounted) {
             final err = context.read<NotesViewModel>().error ?? 'Error actualizando nota';

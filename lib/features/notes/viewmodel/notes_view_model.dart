@@ -1,9 +1,13 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/storage/secure.dart';
+import '../../../core/utils/connectivity.dart';
+import '../data/notes_local_db.dart';
 import '../data/notes_repository.dart';
 import '../domain/note.dart';
 class NotesViewModel extends ChangeNotifier {
+  late final NotesLocalDb _db;
   late final NotesRepository _repo;
 
   bool _busy = false;
@@ -14,15 +18,25 @@ class NotesViewModel extends ChangeNotifier {
   String? get error => _error;
   List<Note> get items => _items;
 
-  NotesViewModel(SecureStore secure) {
-    _repo = NotesRepository(DioClient(secure));
+  Future<void> init(SecureStore secure, {required String host, int port = 3000}) async {
+    _db = NotesLocalDb();
+    await _db.init();
+    _repo = NotesRepository(DioClient(secure), _db, host: host, port: port);
+    await loadLocal();
+    await sync();
   }
 
-  Future<void> load() async {
+  Future<void> loadLocal() async {
     _setBusy(true);
-    _error = null;
+    _items = await _repo.listLocal();
+    _setBusy(false);
+  }
+
+  Future<void> sync() async {
+    _setBusy(true);
     try {
-      _items = await _repo.list();
+      await _repo.sync();
+      _items = await _repo.listLocal();
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -31,48 +45,26 @@ class NotesViewModel extends ChangeNotifier {
   }
 
   Future<bool> add(String title, String content) async {
-    _setBusy(true);
-    try {
-      final created = await _repo.create(title, content);
-      _items = [created, ..._items];
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      return false;
-    } finally {
-      _setBusy(false);
-    }
+    await _repo.createLocal(title, content);
+    await loadLocal();
+    // Intento de sync si hay red
+    await sync();
+    return true;
   }
 
   Future<bool> edit(String id, String title, String content) async {
-    _setBusy(true);
-    try {
-      final updated = await _repo.update(id, title, content);
-      _items = _items.map((n) => n.id == id ? updated : n).toList();
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      return false;
-    } finally {
-      _setBusy(false);
-    }
+    await _repo.updateLocal(id, title, content);
+    await loadLocal();
+    await sync();
+    return true;
   }
 
   Future<bool> remove(String id) async {
-    _setBusy(true);
-    try {
-      await _repo.delete(id);
-      _items = _items.where((n) => n.id != id).toList();
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      return false;
-    } finally {
-      _setBusy(false);
-    }
+    await _repo.deleteLocal(id);
+    await loadLocal();
+    await sync();
+    return true;
   }
-
-  Future<void> refresh() => load();
 
   void _setBusy(bool v) { _busy = v; notifyListeners(); }
 }

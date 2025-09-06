@@ -1,8 +1,8 @@
 class Note {
-  final String id;         // el backend devuelve String(Date.now())
+  final String id;
   final String title;
   final String content;
-  final int updatedAt;     // epoch ms
+  final int updatedAt;
 
   Note({
     required this.id,
