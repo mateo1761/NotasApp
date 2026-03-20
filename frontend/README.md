@@ -1,4 +1,4 @@
-# notasapp_flutter
+# frontend
 
 A new Flutter project.
 

@@ -17,6 +17,12 @@
       "name": "test2",
       "email": "test2@gmail.com",
       "passHash": "$2b$10$hiOB1rAvJasqyf61mSKuMu01wUxrp9cl15yJH/Wg1wA8ODF/NoUle"
+    },
+    {
+      "id": "1773974820582",
+      "name": "teste",
+      "email": "example@gmail.com",
+      "passHash": "$2b$10$EDMoYh1ljTkKptQMTBZl1eANbBBQ8RX0bq3oRXEp./7cyJl1eqwGa"
     }
   ],
   "notes": [

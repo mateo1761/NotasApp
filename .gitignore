@@ -45,6 +45,17 @@ app.*.map.json
 /android/app/release
 
 # Backend
-
 node_modules/
+
+# Frontend
+analysis_options.yaml
+android/
+ios/
+linux/
+macos/
+web/
+windows/
+frontend/.gitignore
+.metadata
+.android/
 

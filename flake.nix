@@ -57,20 +57,6 @@
 
     # Runnables
     apps."${system}" = {
-      backend = {
-        type = "app";
-        program = let
-          script = pkgs.writeShellScriptBin "start-backend" ''
-            if [[ $(basename "$PWD") == "backend" ]]; then
-              npm run start;
-            else
-              echo "> You're not in the required folder 'backend/' "
-              exit
-            fi
-          '';
-        in "${script}/bin/start-backend";
-      };
-
       emulator = {
         type = "app";
         program = let
