@@ -38,9 +38,14 @@ class _NotesListBody extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notas'),
+        title: const Text(
+          'Tus Notas',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        ),
+        backgroundColor: Colors.deepPurpleAccent,
         actions: [
           IconButton(
+            color: Colors.white,
             tooltip: 'Sincronizar',
             onPressed: vm.busy
                 ? null
@@ -56,7 +61,9 @@ class _NotesListBody extends StatelessWidget {
                     if (context.mounted) {
                       messenger.hideCurrentSnackBar();
                       messenger.showSnackBar(
-                        const SnackBar(content: Text('Sincronización completa')),
+                        const SnackBar(
+                          content: Text('Sincronización completa'),
+                        ),
                       );
                     }
                   },
@@ -69,7 +76,8 @@ class _NotesListBody extends StatelessWidget {
                 : const Icon(Icons.sync),
           ),
           IconButton(
-            tooltip: 'Salir',
+            color: Colors.white,
+            tooltip: 'Cerrar Session',
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await auth.logout();
@@ -83,26 +91,32 @@ class _NotesListBody extends StatelessWidget {
           : RefreshIndicator(
               onRefresh: vm.sync,
               child: vm.items.isEmpty
-                  ? const ListTile(title: Text('Sin notas. Pulsa + para crear.'))
+                  ? const Center(child: Text('Sin notas. Pulsa + para crear.'))
                   : ListView.separated(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       itemCount: vm.items.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      separatorBuilder: (_, _) => const SizedBox(height: 8),
                       itemBuilder: (_, i) => _NoteTile(note: vm.items[i]),
                     ),
             ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.deepPurpleAccent,
+        foregroundColor: Colors.white,
         onPressed: () async {
           final data = await Navigator.of(context).push<Map<String, dynamic>?>(
             MaterialPageRoute(builder: (_) => const NoteFormPage()),
           );
           if (data != null) {
             final ok = await context.read<NotesViewModel>().add(
-                  data['title'] as String,
-                  data['content'] as String,
-                );
+              data['title'] as String,
+              data['content'] as String,
+            );
             if (!ok && context.mounted) {
-              final err = context.read<NotesViewModel>().error ?? 'Error creando nota';
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+              final err =
+                  context.read<NotesViewModel>().error ?? 'Error creando nota';
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(err)));
             }
           }
         },
@@ -118,44 +132,89 @@ class _NoteTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(note.title),
-      subtitle: Text(
-        note.content,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-      ),
-      onTap: () async {
-        final data = await Navigator.of(context).push<Map<String, dynamic>?>(
-          MaterialPageRoute(
-            builder: (_) => NoteFormPage(
-              id: note.id,
-              initialTitle: note.title,
-              initialContent: note.content,
+    return Dismissible(
+      key: Key(note.id),
+      direction: DismissDirection.endToStart,
+      confirmDismiss: (direction) async {
+        return await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Eliminar nota'),
+            content: const Text(
+              '¿Estás seguro de que quieres eliminar esta nota?',
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text('Eliminar'),
+              ),
+            ],
           ),
         );
-        if (data != null) {
-          final ok = await context.read<NotesViewModel>().edit(
+      },
+      onDismissed: (_) {
+        context.read<NotesViewModel>().remove(note.id);
+      },
+      background: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: Colors.deepPurpleAccent, width: 2.5),
+        ),
+        child: ListTile(
+          title: Text(
+            note.title,
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text(
+            note.content,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          onTap: () async {
+            final data = await Navigator.of(context)
+                .push<Map<String, dynamic>?>(
+                  MaterialPageRoute(
+                    builder: (_) => NoteFormPage(
+                      id: note.id,
+                      initialTitle: note.title,
+                      initialContent: note.content,
+                    ),
+                  ),
+                );
+            if (data != null) {
+              final ok = await context.read<NotesViewModel>().edit(
                 note.id,
                 data['title'] as String,
                 data['content'] as String,
               );
-          if (!ok && context.mounted) {
-            final err = context.read<NotesViewModel>().error ?? 'Error actualizando nota';
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
-          }
-        }
-      },
-      trailing: IconButton(
-        icon: const Icon(Icons.delete_outline),
-        onPressed: () async {
-          final ok = await context.read<NotesViewModel>().remove(note.id);
-          if (!ok && context.mounted) {
-            final err = context.read<NotesViewModel>().error ?? 'Error eliminando nota';
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
-          }
-        },
+              if (!ok && context.mounted) {
+                final err =
+                    context.read<NotesViewModel>().error ??
+                    'Error actualizando nota';
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(err)));
+              }
+            }
+          },
+        ),
       ),
     );
   }

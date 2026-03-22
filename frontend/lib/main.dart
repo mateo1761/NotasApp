@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+import 'package:frontend/core/utils/routes.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'core/storage/secure.dart';
@@ -10,10 +11,10 @@ import 'features/notes/presentation/notes_list_page.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      sqfliteFfiInit();
-      databaseFactory = databaseFactoryFfi;
-    }
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
 
   runApp(const NotasApp());
 }
@@ -26,15 +27,21 @@ class NotasApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider(create: (_) => SecureStore()),
-        ChangeNotifierProvider(create: (ctx) => AuthViewModel(ctx.read<SecureStore>())..init()),
+        ChangeNotifierProvider(
+          create: (ctx) => AuthViewModel(ctx.read<SecureStore>())..init(),
+        ),
       ],
       child: Consumer<AuthViewModel>(
-        builder: (_, auth, __) {
+        builder: (_, auth, _) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'NotasApp',
             theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
-            home: auth.isAuthenticated ? const NotesListPage() : const LoginPage(),
+            initialRoute: auth.isAuthenticated
+                ? Routes.menuScreen
+                : Routes.loginScreen,
+
+            routes: Routes.routes,
           );
         },
       ),
@@ -43,3 +50,4 @@ class NotasApp extends StatelessWidget {
 }
 
 //Test@gmail.com
+

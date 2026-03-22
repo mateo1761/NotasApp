@@ -42,6 +42,7 @@ class _RegisterPageState extends State<RegisterPage> {
     final auth = context.watch<AuthViewModel>();
 
     return Scaffold(
+      appBar: AppBar(),
       body: Center(
         child: SingleChildScrollView(
           child: Container(

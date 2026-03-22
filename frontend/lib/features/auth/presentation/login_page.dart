@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/utils/routes.dart';
 import 'package:provider/provider.dart';
 import '../../auth/viewmodel/auth_view_model.dart';
 import 'register_page.dart';
@@ -77,14 +78,17 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: auth.busy
                             ? null
                             : () async {
+                                final navigator = Navigator.of(context);
+                                final messenger = ScaffoldMessenger.of(context);
                                 await auth.login(
                                   _email.text.trim(),
                                   _pass.text,
                                 );
                                 if (!mounted) return;
                                 if (auth.isAuthenticated) {
+                                  navigator.pushReplacementNamed(Routes.menuScreen);
                                 } else if (auth.error != null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
+                                  messenger.showSnackBar(
                                     SnackBar(content: Text(auth.error!)),
                                   );
                                 }
@@ -102,11 +106,9 @@ class _LoginPageState extends State<LoginPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const RegisterPage(),
-                          ),
-                        ),
+                        onPressed: () => Navigator.of(
+                          context,
+                        ).pushNamed(Routes.registerScreen),
                         child: const Text(
                           'Crear cuenta',
                           style: TextStyle(color: Colors.deepPurpleAccent),
