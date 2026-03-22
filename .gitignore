@@ -46,6 +46,7 @@ app.*.map.json
 
 # Backend
 node_modules/
+db.json
 
 # Frontend
 analysis_options.yaml
