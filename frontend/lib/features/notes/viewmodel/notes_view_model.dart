@@ -1,8 +1,6 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/storage/secure.dart';
-import '../../../core/utils/connectivity.dart';
 import '../data/notes_local_db.dart';
 import '../data/notes_repository.dart';
 import '../domain/note.dart';

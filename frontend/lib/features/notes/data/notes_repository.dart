@@ -1,6 +1,4 @@
-import 'dart:io';
 import '../../../core/network/dio_client.dart';
-import '../../../core/storage/secure.dart';
 import '../../../core/utils/connectivity.dart';
 import '../domain/note.dart';
 import 'notes_api.dart';

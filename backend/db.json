@@ -1,12 +1,6 @@
 {
   "users": [
     {
-      "id": "1757177330002",
-      "name": "juancamilo",
-      "email": "juancamilo@gmail.com",
-      "passHash": "$2b$10$Q3Hgevfx4Y9BaRO5PcNsP.rbG9rLt7t6VXGyWHBe6mZjATVz48.NK"
-    },
-    {
       "id": "1757179206552",
       "name": "test2",
       "email": "test2@gmail.com",
@@ -23,6 +17,12 @@
       "name": "test",
       "email": "test@gmail.com",
       "passHash": "$2b$10$O6PqpeDyItqnjQfy5Z19Q.9o4/Fhsy.eIb/tcdMoQn0njYe1pKOie"
+    },
+    {
+      "id": "1774482833441",
+      "name": "PruebaMat",
+      "email": "PruebaMat@test.com",
+      "passHash": "$2b$10$bRUQ85bZxCu3Bm.NaVIfOOjaFwgMbiagPSY7vSNCaCet7IlNWhG8."
     }
   ],
   "notes": [

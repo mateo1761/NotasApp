@@ -5,8 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'core/storage/secure.dart';
 import 'features/auth/viewmodel/auth_view_model.dart';
-import 'features/auth/presentation/login_page.dart';
-import 'features/notes/presentation/notes_list_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
