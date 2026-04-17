@@ -23,6 +23,18 @@
       "name": "PruebaMat",
       "email": "PruebaMat@test.com",
       "passHash": "$2b$10$bRUQ85bZxCu3Bm.NaVIfOOjaFwgMbiagPSY7vSNCaCet7IlNWhG8."
+    },
+    {
+      "id": "1774920495082",
+      "name": "Mateo",
+      "email": "Mateo12@gmail.com",
+      "passHash": "$2b$10$fE.ool1XGqWCC0pDJVW4MO1pfw1elT0x060KXZsfDU3zCVmduYZia"
+    },
+    {
+      "id": "1776453014242",
+      "name": "Test",
+      "email": "test@test.com",
+      "passHash": "$2b$10$/VArmUCP7dww965qxlIxseq2hpt.iYkUvvz6KemyNOOpvVjxsLxFK"
     }
   ],
   "notes": [
@@ -95,6 +107,13 @@
       "title": "Test2",
       "content": "Hello",
       "updatedAt": 1774219190965
+    },
+    {
+      "id": "1774920664114",
+      "userId": "1774920495082",
+      "title": "To do List",
+      "content": "- Comprar Zapatos\n- Pagar el Arriendo",
+      "updatedAt": 1774920664114
     }
   ]
 }
