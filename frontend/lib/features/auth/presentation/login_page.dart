@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/storage/secure.dart';
 import 'package:frontend/core/utils/routes.dart';
 import 'package:provider/provider.dart';
 import '../../auth/viewmodel/auth_view_model.dart';
@@ -85,7 +86,9 @@ class _LoginPageState extends State<LoginPage> {
                                 );
                                 if (!mounted) return;
                                 if (auth.isAuthenticated) {
-                                  navigator.pushReplacementNamed(Routes.menuScreen);
+                                  navigator.pushReplacementNamed(
+                                    Routes.menuScreen,
+                                  );
                                 } else if (auth.error != null) {
                                   messenger.showSnackBar(
                                     SnackBar(content: Text(auth.error!)),

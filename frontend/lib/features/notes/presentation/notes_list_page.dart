@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+import 'package:frontend/core/utils/routes.dart';
 import 'package:provider/provider.dart';
 import '../../../core/storage/secure.dart';
 import '../../auth/viewmodel/auth_view_model.dart';
@@ -77,11 +78,21 @@ class _NotesListBody extends StatelessWidget {
           ),
           IconButton(
             color: Colors.white,
+            tooltip: 'Configuracion',
+            icon: const Icon(Icons.settings),
+            onPressed: () async {
+              Navigator.pushNamed(context, Routes.infoScreen);
+            },
+          ),
+          IconButton(
+            color: Colors.white,
             tooltip: 'Cerrar Session',
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await auth.logout();
-              if (context.mounted) Navigator.of(context).pop();
+              if (context.mounted) {
+                Navigator.pushReplacementNamed(context, Routes.loginScreen);
+              }
             },
           ),
         ],
