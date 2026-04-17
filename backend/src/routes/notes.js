@@ -10,7 +10,7 @@ export function setupNotesRoutes(app) {
   });
 
   app.post("/notes", authGuard, async (req, res) => {
-    const { title, content } = req.body || {};
+    const { title, content, location } = req.body || {};
     if (!title) return res.status(400).json({ message: "title is required" });
 
     const n = {
@@ -18,6 +18,7 @@ export function setupNotesRoutes(app) {
       userId: req.user.id,
       title,
       content: content || "",
+      location: location || null,
       updatedAt: Date.now(),
     };
     notes.push(n);
@@ -30,13 +31,14 @@ export function setupNotesRoutes(app) {
     const idx = notes.findIndex((n) => n.id === id && n.userId === req.user.id);
     if (idx < 0) return res.status(404).json({ message: "Note not found" });
 
-    const { title, content } = req.body || {};
+    const { title, content, location } = req.body || {};
     if (!title) return res.status(400).json({ message: "title is required" });
 
     notes[idx] = {
       ...notes[idx],
       title,
       content: content ?? notes[idx].content,
+      location: location ?? notes[idx].location,
       updatedAt: Date.now(),
     };
     await dbWrite();

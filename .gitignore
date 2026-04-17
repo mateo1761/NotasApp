@@ -50,7 +50,6 @@ db.json
 
 # Frontend
 analysis_options.yaml
-android/
 ios/
 linux/
 macos/

@@ -13,14 +13,22 @@ class NotesApi {
     throw Exception('List failed [${res.statusCode}]: ${res.data}');
   }
 
-  Future<Note> create(String title, String content) async {
-    final res = await dio.post('/notes', data: {'title': title, 'content': content});
+  Future<Note> create(String title, String content, {String? location}) async {
+    final res = await dio.post('/notes', data: {
+      'title': title,
+      'content': content,
+      'location': location,
+    });
     if (res.statusCode == 201) return Note.fromJson(res.data as Map<String, dynamic>);
     throw Exception('Create failed [${res.statusCode}]: ${res.data}');
   }
 
-  Future<Note> update(String id, String title, String content) async {
-    final res = await dio.put('/notes/$id', data: {'title': title, 'content': content});
+  Future<Note> update(String id, String title, String content, {String? location}) async {
+    final res = await dio.put('/notes/$id', data: {
+      'title': title,
+      'content': content,
+      'location': location,
+    });
     if (res.statusCode == 200) return Note.fromJson(res.data as Map<String, dynamic>);
     throw Exception('Update failed [${res.statusCode}]: ${res.data}');
   }

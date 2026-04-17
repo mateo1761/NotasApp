@@ -121,6 +121,7 @@ class _NotesListBody extends StatelessWidget {
             final ok = await context.read<NotesViewModel>().add(
               data['title'] as String,
               data['content'] as String,
+              location: data['location'] as String?,
             );
             if (!ok && context.mounted) {
               final err =
@@ -193,10 +194,33 @@ class _NoteTile extends StatelessWidget {
             note.title,
             style: TextStyle(fontWeight: FontWeight.w600),
           ),
-          subtitle: Text(
-            note.content,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (note.location != null && note.location!.isNotEmpty)
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, size: 16, color: Colors.deepPurpleAccent),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        note.location!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.deepPurpleAccent,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              Text(
+                note.content,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
           onTap: () async {
             final data = await Navigator.of(context)
@@ -206,6 +230,7 @@ class _NoteTile extends StatelessWidget {
                       id: note.id,
                       initialTitle: note.title,
                       initialContent: note.content,
+                      initialLocation: note.location,
                     ),
                   ),
                 );
@@ -214,6 +239,7 @@ class _NoteTile extends StatelessWidget {
                 note.id,
                 data['title'] as String,
                 data['content'] as String,
+                location: data['location'] as String?,
               );
               if (!ok && context.mounted) {
                 final err =

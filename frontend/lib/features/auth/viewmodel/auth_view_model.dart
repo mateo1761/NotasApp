@@ -10,17 +10,26 @@ class AuthViewModel extends ChangeNotifier {
   bool _busy = false;
   String? _error;
   bool _isAuth = false;
+  bool _initialized = false;
 
   bool get busy => _busy;
   String? get error => _error;
   bool get isAuthenticated => _isAuth;
+  bool get isInitialized => _initialized;
 
   AuthViewModel(this._secure) {
     _repo = AuthRepository(DioClient(_secure), _secure);
   }
 
   Future<void> init() async {
-    _isAuth = (await _secure.readToken()) != null;
+    try {
+      final String? token = await _secure.readToken();
+      _isAuth = token != null && token.isNotEmpty;
+    } catch (e) {
+      debugPrint('AuthViewModel.init error: $e');
+      _isAuth = false;
+    }
+    _initialized = true;
     notifyListeners();
   }
 

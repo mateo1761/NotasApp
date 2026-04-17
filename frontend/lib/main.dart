@@ -4,7 +4,9 @@ import 'package:frontend/core/utils/routes.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'core/storage/secure.dart';
+import 'features/auth/presentation/login_page.dart';
 import 'features/auth/viewmodel/auth_view_model.dart';
+import 'features/notes/presentation/notes_list_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,14 +33,21 @@ class NotasApp extends StatelessWidget {
       ],
       child: Consumer<AuthViewModel>(
         builder: (_, auth, _) {
+          if (!auth.isInitialized) {
+            return const MaterialApp(
+              home: Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            );
+          }
+
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'NotasApp',
             theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
-            initialRoute: auth.isAuthenticated
-                ? Routes.menuScreen
-                : Routes.loginScreen,
-
+            home: auth.isAuthenticated ? const NotesListPage() : const LoginPage(),
             routes: Routes.routes,
           );
         },
