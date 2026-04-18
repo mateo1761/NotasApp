@@ -42,6 +42,6 @@ class LocationUtils {
   }
 
   static String formatCoordinates(Position position) {
-    return 'https://www.google.com/maps?q=${position.latitude},${position.longitude}';
+    return 'https://www.google.com/maps/@${position.latitude},${position.longitude}';
   }
 }

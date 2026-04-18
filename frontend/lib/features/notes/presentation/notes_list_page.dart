@@ -1,8 +1,8 @@
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+import 'package:frontend/core/storage/secure.dart';
 import 'package:frontend/core/utils/routes.dart';
 import 'package:provider/provider.dart';
-import '../../../core/storage/secure.dart';
 import '../domain/note.dart';
 import '../viewmodel/notes_view_model.dart';
 import 'note_form_page.dart';
@@ -34,12 +34,23 @@ class _NotesListBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<NotesViewModel>();
+    final secure = context.read<SecureStore>();
+    final payloadFuture = secure.readTokenPayload();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Tus Notas',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        title: FutureBuilder<Map<String, dynamic>?>(
+          future: payloadFuture,
+          builder: (context, snapshot) {
+            final name = snapshot.data?['name'] as String?;
+            return Text(
+              name != null ? 'Notas de $name' : 'Tus Notas',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            );
+          },
         ),
         backgroundColor: Colors.deepPurpleAccent,
         actions: [
