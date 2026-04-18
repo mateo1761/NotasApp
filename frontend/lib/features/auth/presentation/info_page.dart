@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/storage/secure.dart';
+import '../../../core/utils/routes.dart';
+import '../../auth/viewmodel/auth_view_model.dart';
 
 class InfoPage extends StatelessWidget {
   const InfoPage({super.key});
@@ -8,6 +10,7 @@ class InfoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final secure = context.read<SecureStore>();
+    final auth = context.read<AuthViewModel>();
     final payloadFuture = secure.readTokenPayload();
 
     return Scaffold(
@@ -51,6 +54,29 @@ class InfoPage extends StatelessWidget {
                     _InfoCard(label: 'Nombre', value: name),
                     const SizedBox(height: 16),
                     _InfoCard(label: 'Email', value: email),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        icon: const Icon(Icons.logout),
+                        label: const Text('Cerrar Sesión'),
+                        onPressed: () async {
+                          await auth.logout();
+                          if (context.mounted) {
+                            Navigator.of(context).popUntil((route) => route.isFirst);
+                            Navigator.pushReplacementNamed(context, Routes.loginScreen);
+                          }
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
